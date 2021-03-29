@@ -1,0 +1,36 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    container_name: "vote-mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: <YOUR_PASSWORD>
+      MYSQL_DATABASE: votes_data
+      MYSQL_USER: employee_vote
+      MYSQL_PASSWORD: <YOUR_PASSWORD>
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+
+  vote-backend:
+    build: ./backend
+    container_name: "vote-backend"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - "mysql"
+    restart: on-failure
+
+  vote-frontend:
+    build: ./frontend
+    container_name: "vote-frontend"
+    ports:
+      - "80:80"
+    depends_on:
+      - "vote-backend"
+
+volumes:
+  db-data:
